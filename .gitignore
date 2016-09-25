@@ -1,4 +1,4 @@
-graphrank/src/build/lib.linux-x86_64-2.7
+src/build
 pythontest.py
 
 *.pyc
