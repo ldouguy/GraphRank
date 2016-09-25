@@ -1,4 +1,4 @@
-import GraphUtils as GU
+import GraphUtils as gu
 
 class GR:
 	def __init__(self, winDict, drawDict, cycleDict, isBelow):

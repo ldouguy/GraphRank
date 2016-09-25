@@ -14,6 +14,9 @@ def MG_to_M(MG):
 			M[winner][loser] = MG[winner][loser]
 	return np.matrix(M)
 
+# record draws as a second dictionary
+# TO DO: write function which determines who wins
+#   function(array(matches)) where matches are (winner, date) pairs
 def MG_to_G(MG):
     G = {v: set() for v in MG}
     D = {v: set() for v in MG}
@@ -145,3 +148,25 @@ def katz_degree(A, k):
         katz += curr_damp*curr
 
     return katz
+
+# using damping coeff = .5 for ease of use now, can make this configurable
+def KRank(A):
+    D = katz_degree(A, .5)
+    K = (np.sum(D, axis=1)).flatten().tolist()[0]
+
+    players = range(len(A))
+
+    KRank = sorted(players, key=lambda v: K[v], reverse=True)
+
+    return KRank
+
+def DRank(A):
+    D = katz_degree(A, .5)
+    K = (np.sum(D, axis=1)).flatten().tolist()[0]
+    KL = (np.sum(D, axis=0)).flatten().tolist()[0]
+
+    players = range(len(A))
+
+    DRank = sorted(players, key=lambda v: K[v] - KL[v], reverse=True)
+
+    return DRank

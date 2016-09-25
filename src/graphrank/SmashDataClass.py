@@ -1,8 +1,8 @@
 from ChallongeAPI import add_players
 from ChallongeAPI import add_matches
 from collections import defaultdict
-from GraphReduceClass import GR
-import GraphUtils as GU
+from AdjustedKatzRankClass import AKR
+import GraphUtils as gu
 
 class SD:
 	def __init__(self, multiGraph=None, aliasList=None, aliasSet=None, aliasDict=None):
@@ -37,8 +37,8 @@ class SD:
 	# assoc is association dict of challonge tags
 	#	assoc = {non-preferred tag : preferred tag}
 	# build assoc using challonge module directly
-	
-	def init_from_assoc(assoc):
+
+	def init_from_assoc(self, assoc):
 		for player in assoc:
 			self.aliasSet.add(player)
 			if assoc[player] not in self.aliasSet:
@@ -50,18 +50,12 @@ class SD:
 	############################
 
 	def calc_setCounts(self):
-		self.setCounts = GU.MG_to_M(self.multiGraph)
+		self.setCounts = gu.MG_to_M(self.multiGraph)
 		return self.setCounts
 
-	def calc_GR(self):
-		arr = GU.MG_to_G(self.multiGraph)
-		part = GU.SCC(arr[0])
-		inCycle = GU.record_cycles(arr[0], part)
-		self.GR = GR(arr[0], arr[1], inCycle, GU.record_above(arr[0], inCycle))
+	def calc_AKR(self):
+		arr = gu.MG_to_G(self.multiGraph)
+		self.AKR = AKR(arr[0])
+		self.AKR.reduce()
 
-		return self.GR
-
-	def print_GR(self):
-		for v in self.GR.top:
-			print "%d : %s" % (v, self.aliasList[v])
-			print self.GR.records[v]
+		return self.AKR.ranking

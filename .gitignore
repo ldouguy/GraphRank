@@ -1,0 +1,4 @@
+pythontest.py
+
+*.pyc
+*.ipynb
