@@ -1,6 +1,5 @@
-from SmashDataClass import SD
-from numpy import linalg as LA
-import GraphUtils as gu
+from graphrank.SmashDataClass import SD
+from graphrank import GraphUtils as gu
 import json
 
 with open('MI_assoc.json') as datafile:
@@ -20,4 +19,4 @@ ranking = MISD.calc_AKR()
 
 print "Rankings:\n--------------"
 for i in range(len(ranking)):
-    print "%s: %s" % (i, MISD.aliasList[ranking[i]])
+    print "%s: %s" % (i+1, MISD.aliasList[ranking[i]])
