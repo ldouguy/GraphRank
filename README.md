@@ -35,6 +35,7 @@ Upcoming updates should be focued on:
 
 - Accuracy of the Katz Centrality and correcting algorithm
 - Addition of functionality such as excluding players with too few tournaments or games
+- Incorporation of cycle resolution (known as the FAS problem: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.47.7745)
 - More data files added
 
 For any questions, please contact me via github.
