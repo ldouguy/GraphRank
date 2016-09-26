@@ -1,5 +1,8 @@
 import GraphUtils as gu
 
+# Class used to test different methods of ranking iteratively
+# Strictly for testing, not used in the usage of the SD class
+
 class GR:
 	def __init__(self, winDict, drawDict, cycleDict, isBelow):
 		records = {v: [set(), set(), set(), set()] for v in winDict}

@@ -1,5 +1,8 @@
 import numpy as np
 
+# data conversion utils
+###########################
+
 # G denotes dict representation of graph with ID1 in G[ID2] if player 2 beats player 1
 # MG denotes multigraph dict representation of graph (MG = {winner: {loser: score}})
 # M denotes matrix representation of graph with n = M[i][j] where player i beats player j n times
@@ -46,6 +49,32 @@ def G_to_A(G):
 
     return np.matrix(A)
 
+# Katz Centrality
+############################
+
+def katz_degree(A, k):
+    katz = k*A
+
+    curr = A.copy()
+    curr_damp = k
+
+    for i in range(10):
+        curr *= A
+        curr_damp *= k
+        katz += curr_damp*curr
+
+    return katz
+
+# using damping coeff = .5 for ease of use now, can make this configurable
+def KRank(A):
+    D = katz_degree(A, .5)
+    K = (np.sum(D, axis=1)).flatten().tolist()[0]
+
+    players = range(len(A))
+
+    KRank = sorted(players, key=lambda v: K[v], reverse=True)
+
+    return KRank
 
 # Tarjan
 ########################
@@ -132,41 +161,3 @@ def record_isBelow(G, inCycle):
             isBelow[v] |= G[w]-inCycle[w]
 
     return isBelow
-
-# Katz Centrality
-############################
-
-def katz_degree(A, k):
-    katz = k*A
-
-    curr = A.copy()
-    curr_damp = k
-
-    for i in range(10):
-        curr *= A
-        curr_damp *= k
-        katz += curr_damp*curr
-
-    return katz
-
-# using damping coeff = .5 for ease of use now, can make this configurable
-def KRank(A):
-    D = katz_degree(A, .5)
-    K = (np.sum(D, axis=1)).flatten().tolist()[0]
-
-    players = range(len(A))
-
-    KRank = sorted(players, key=lambda v: K[v], reverse=True)
-
-    return KRank
-
-def DRank(A):
-    D = katz_degree(A, .5)
-    K = (np.sum(D, axis=1)).flatten().tolist()[0]
-    KL = (np.sum(D, axis=0)).flatten().tolist()[0]
-
-    players = range(len(A))
-
-    DRank = sorted(players, key=lambda v: K[v] - KL[v], reverse=True)
-
-    return DRank
