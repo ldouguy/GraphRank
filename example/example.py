@@ -2,7 +2,7 @@ from graphrank.SmashDataClass import SD
 from graphrank import GraphUtils as gu
 import json
 
-with open('MI_assoc.json') as datafile:
+with open('../data/MI_assoc.json') as datafile:
     assoc = json.load(datafile)
 
 MISD = SD()
@@ -20,3 +20,6 @@ ranking = MISD.calc_AKR()
 print "Rankings:\n--------------"
 for i in range(len(ranking)):
     print "%s: %s" % (i+1, MISD.aliasList[ranking[i]])
+
+with open('example.json', 'w') as outfile:
+	json.dump([MISD.aliasList[x] for x in ranking], outfile)
