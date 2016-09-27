@@ -1,13 +1,15 @@
 import numpy as np
+from collections import defaultdict
 
 # data conversion utils
 ###########################
 
 # G denotes dict representation of graph with ID1 in G[ID2] if player 2 beats player 1
+# D denotes dict of draws: j in D[i] if i and j beat each other equal times
 # MG denotes multigraph dict representation of graph (MG = {winner: {loser: score}})
 # M denotes matrix representation of graph with n = M[i][j] where player i beats player j n times
-# A denotes matrix adjacency matrix
-# T denotes "touching" matrix (symm(A))
+# A denotes matrix adjacency matrix (A[i][j] = 1 if i beats j)
+# T denotes "touching" matrix (symm(A) or T[i][j] = 1 if A[i][j] or A[j][i] = 1)
 
 def MG_to_M(MG):
 	count = len(MG)
@@ -20,6 +22,7 @@ def MG_to_M(MG):
 # record draws as a second dictionary
 # TO DO: write function which determines who wins
 #   function(array(matches)) where matches are (winner, date) pairs
+
 def MG_to_G(MG):
     G = {v: set() for v in MG}
     D = {v: set() for v in MG}
@@ -161,3 +164,20 @@ def record_isBelow(G, inCycle):
             isBelow[v] |= G[w]-inCycle[w]
 
     return isBelow
+
+def record_stronglyBelow(G, isBelow, inCycle):
+    stronglyBelow = {
+        v: set() for v in G
+    }
+
+    connectCount = defaultdict(int)
+
+    for v in G:
+        for w in G[v]-inCycle[v]:
+            connectCount[(v, w)] += 1
+
+    for (v, w) in connectCount:
+        if connectCount[(v, w)] > 1:
+            stronglyBelow[v].add(w)
+
+    return stronglyBelow
