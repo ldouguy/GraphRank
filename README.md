@@ -25,7 +25,7 @@ Once this graph is retrieved from tournament results, centrality analysis is ran
 
 ## Ranking Paradigm
 
-GraphRank focuses on using the entire network of player data to infer connections between any pair of players. This is a completely different philosophy from the only existing algorithms, which are entirely point based. Point based algorithms are more explicit and detail oriented, without much focus on inference of data. Because competitive scenes which rely on tournaments have much less data than competitive scenes such as DoTa or LoL, data inference must be prioritized. (For more details, read my blog post about the subject: http://www.meleeitonme.com/guest-article-the-state-of-smash-and-rankings/)
+GraphRank focuses on using the entire network of player data to infer connections between any pair of players. This is a completely different philosophy from the only existing algorithms, which are entirely point based. Point based algorithms are more explicit and detail oriented, without much focus on inference of data. Because competitive scenes which rely on tournaments have much less data than competitive scenes such as DotA or LoL, data inference must be prioritized. (For more details, read my blog post about the subject: http://www.meleeitonme.com/guest-article-the-state-of-smash-and-rankings/)
 
 ## Ongoing Development:
 
