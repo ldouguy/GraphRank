@@ -2,8 +2,6 @@
 setup.py
 graphrank/AdjustedKatzRankClass.py
 graphrank/ChallongeAPI.py
-graphrank/GraphReduceClass.py
-graphrank/GraphReduceTemplate.py
 graphrank/GraphUtils.py
 graphrank/SmashDataClass.py
 graphrank/__init__.py

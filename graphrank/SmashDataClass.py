@@ -30,17 +30,6 @@ class SD:
 
 	############################
 
-	def challonge_add_players(self, tourneyID):
-		add_players(tourneyID, self.aliasSet, self.aliasDict, self.aliasList, self.tourneyCount)
-		print "players added for %s" % tourneyID
-
-	def challonge_init_multiGraph(self):
-		self.multiGraph = {i: Counter() for i in range(len(self.aliasList))}
-
-	def challonge_add_matches(self, tourneyID):
-		add_matches(tourneyID, self.multiGraph, self.aliasDict)
-		print "matches added for %s" % tourneyID
-
 	# invoke this function on a fresh SD
 	# assoc is association dict of challonge tags
 	#	assoc = {non-preferred tag : preferred tag}
@@ -53,6 +42,17 @@ class SD:
 				self.aliasList.append(assoc[player])
 				self.aliasDict[assoc[player]] = len(self.aliasList)-1
 			self.aliasDict[player] = self.aliasDict[assoc[player]]
+			
+	def challonge_add_players(self, tourneyID):
+		add_players(tourneyID, self.aliasSet, self.aliasDict, self.aliasList, self.tourneyCount)
+		print "players added for %s" % tourneyID
+
+	def challonge_init_multiGraph(self):
+		self.multiGraph = {i: Counter() for i in range(len(self.aliasList))}
+
+	def challonge_add_matches(self, tourneyID):
+		add_matches(tourneyID, self.multiGraph, self.aliasDict)
+		print "matches added for %s" % tourneyID
 
 	# run all 3 challonge functions above on a list of tourneys
 	# only run this if you won't add any more tourneys afterwards

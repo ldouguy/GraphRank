@@ -19,21 +19,12 @@ MISD.init_from_assoc(assoc)
 # then iterate through tournaments, given by challonge URL name, and add each tourney's data
 
 tourneys = ["sweetprologue-meleesingles", "michigansmash-sweetmeleesingles17", "michigansmash-sweetmeleesingles18", "GrandPrix3Melee", "beachsmash-BB8", "beachsmash-BB9", "beachsmash-BB10"]
-for tourneyID in tourneys:
-	MISD.challonge_add_players(tourneyID)
-MISD.challonge_init_multiGraph()
-for tourneyID in tourneys:
-	MISD.challonge_add_matches(tourneyID)
+MISD.challonge_add_tourneys(tourneys)
 
-# call calc_AKR() to return the final rankings
+# then calculate the rankings and spit out a data file and/or print the results
 
-ranking = MISD.calc_AKR()
-
-# print the results and write them to a file or whatever you'd like
-
-print "Rankings:\n--------------"
-for i in range(len(ranking)):
-    print "%s: %s" % (i+1, MISD.aliasList[ranking[i]])
-
-with open('example.json', 'w') as outfile:
-	json.dump([MISD.aliasList[x] for x in ranking], outfile, indent=2)
+MISD.calc_data()
+MISD.calc_AKR()
+MISD.AKR.reduce()
+MISD.record_AKR_ranking("example.json")
+MISD.print_AKR_ranking()
