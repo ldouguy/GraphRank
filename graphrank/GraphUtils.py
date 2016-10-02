@@ -1,5 +1,5 @@
 import numpy as np
-from collections import defaultdict
+from collections import Counter
 
 # data conversion utils
 ###########################
@@ -55,29 +55,41 @@ def G_to_A(G):
 # Katz Centrality
 ############################
 
-def katz_degree(A, k):
+def katz_degree(A, k, lim):
     katz = k*A
 
     curr = A.copy()
     curr_damp = k
 
-    for i in range(10):
+    for i in range(lim):
         curr *= A
         curr_damp *= k
         katz += curr_damp*curr
 
     return katz
 
-# using damping coeff = .5 for ease of use now, can make this configurable
-def KRank(A):
-    D = katz_degree(A, .5)
-    K = (np.sum(D, axis=1)).flatten().tolist()[0]
+# direction gives direction of arrows in graph
+# 0 for losses, 1 for wins(default)
+def KRank(A, k, lim, direction=1, reverse=True):
+    D = katz_degree(A, k, lim)
+    K = (np.sum(D, axis=direction)).flatten().tolist()[0]
 
-    players = range(len(A))
+    players = zip(range(len(A)), K)
 
-    KRank = sorted(players, key=lambda v: K[v], reverse=True)
+    KRank = sorted(players, key=lambda v: v[1], reverse=reverse)
 
     return KRank
+
+def DRank(A, k, lim, scale, reverse=True):
+    B = katz_degree(A, k, lim)
+    K = (np.sum(B, axis=1)).flatten().tolist()[0]
+    KL = (np.sum(B, axis=0)).flatten().tolist()[0]
+
+    players = zip(range(len(A)), [K[v] - scale*KL[v] for v in range(len(K))])
+
+    DRank = sorted(players, key=lambda v: v[1], reverse=reverse)
+
+    return DRank
 
 # Tarjan
 ########################
@@ -170,11 +182,12 @@ def record_stronglyBelow(G, isBelow, inCycle):
         v: set() for v in G
     }
 
-    connectCount = defaultdict(int)
+    connectCount = Counter()
 
     for v in G:
         for w in G[v]-inCycle[v]:
-            connectCount[(v, w)] += 1
+            for x in G[w]-inCycle[w]:
+                connectCount[(v, x)] += 1
 
     for (v, w) in connectCount:
         if connectCount[(v, w)] > 1:

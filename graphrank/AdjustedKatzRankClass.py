@@ -2,44 +2,53 @@ import GraphUtils as gu
 import numpy as np
 
 # some lazy assumptions are made as written
-# top_idx starts at 10, so there should be at least ~100 entries
-# reduce() halts at 1/3 of player count, so player count/3 must be > top_idx
 
 class AKR:
-	def __init__(self, winDict):
-		self.winDict = winDict
+	def __init__(self, multiGraph, A):
+		self.rankdata = []
+		self.remaining = range(len(multiGraph))
+		self.nowins = []
 
-		adj = gu.G_to_A(winDict)
-		KRank = gu.KRank(adj)
+		self.A = A
 
-		self.top_idx = 10
-		self.KRank = KRank
-		self.top = set(KRank[:self.top_idx])
+		for i in multiGraph:
+			if not multiGraph[i]:
+				self.nowins.append(i)
+				self.remaining.remove(i)
+		self.count = len(self.remaining)
 
-		self.ranking = []
-		self.count = len(winDict)
+		currA = self.A[np.ix_(self.remaining, self.remaining)]
 
-		A = np.matrix([[0 for v in range(self.count)] for v in range(self.count)])
-		for v in self.top:
-			for w in winDict[v] & self.top:
-				A[v, w] = 1
+		eigval = max(abs(np.linalg.eig(currA)[0]))
+		if not eigval or eigval < 1.6:
+			eigval = 1.6
+		escale = round(.8*eigval**(-1), 2)
 
-		self.top_A = A
+		rankdata = gu.KRank(currA, escale, 50, reverse=False)
+		self.currank = [(self.remaining[i], j) for i, j in rankdata]
 
 	def reduce(self):
-		top_i = [x for x in gu.KRank(self.top_A) if x in self.top][0]
-		self.ranking.append(top_i)
-		self.top.remove(top_i)
+		if len(self.currank) <= 5:
+			self.rankdata.append(self.currank)
 
-		i = self.KRank[self.top_idx]
-		self.top.add(i)
-		self.top_idx += 1
+		else:
+			self.rankdata.append(self.currank)
 
-		for j in self.winDict[i] & self.top:
-			self.top_A[i, j] = 1
-		for j in self.top:
-			if i in self.winDict[j]:
-				self.top_A[j, i] = 1
+			#find point of change after cutoff point
+			n = len(self.currank)/3
+			while self.currank[n] == self.currank[n+1]:
+				n += 1
 
-		if self.top_idx < self.count/3:
+			for i in [i for i,j in self.currank[:n]]:
+				self.remaining.remove(i)
+
+			currA = self.A[np.ix_(self.remaining, self.remaining)]
+			eigval = max(abs(np.linalg.eig(currA)[0]))
+			if not eigval or eigval < 1.6:
+				eigval = 1.6
+			escale = round(.8*eigval**(-1), 2)
+
+			rankdata = gu.DRank(currA, escale, 50, float(len(self.rankdata))/self.count, reverse=False)
+			self.currank = [(self.remaining[i], j) for i, j in rankdata]
+
 			self.reduce()
