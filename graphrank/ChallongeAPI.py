@@ -1,5 +1,12 @@
 import challonge
-challonge.set_credentials("thugz", "Xa800POPVzeEDIciibV0HLPtQvPYpiXE5zbRuhqq")
+import json
+
+with open('credentials.json') as data:
+	cred = json.load(data)
+	user = cred['username']
+	secretkey = cred['secretkey']
+
+challonge.set_credentials(user, secretkey)
 
 def add_players(tourneyID, aliasSet, aliasDict, aliasList, tourneyCount):
 	players = challonge.participants.index(tourneyID)
@@ -14,7 +21,7 @@ def add_players(tourneyID, aliasSet, aliasDict, aliasList, tourneyCount):
 		# probably safe assumption, should probably formalize check later
 		# use an assert and raise an error otherwise
 		aliasDict[player['id']] = aliasDict[player['name']]
-		tourneyCount[player['id']] += 1
+		tourneyCount[aliasDict[player['id']]] += 1
 
 def add_matches(tourneyID, multiGraph, aliasDict):
 	matches = challonge.matches.index(tourneyID)

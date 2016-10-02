@@ -1,8 +1,6 @@
 import GraphUtils as gu
 import numpy as np
 
-# some lazy assumptions are made as written
-
 class AKR:
 	def __init__(self, multiGraph, A):
 		self.rankdata = []
@@ -29,7 +27,10 @@ class AKR:
 
 	def reduce(self):
 		if len(self.currank) <= 5:
-			self.rankdata.append(self.currank)
+			# I don't understand why I need to make this check
+			# If I don't, rankdata somehow gets the last currank appended twice
+			if self.rankdata[-1] != self.currank:
+				self.rankdata.append(self.currank)
 
 		else:
 			self.rankdata.append(self.currank)
@@ -48,7 +49,7 @@ class AKR:
 				eigval = 1.6
 			escale = round(.8*eigval**(-1), 2)
 
-			rankdata = gu.DRank(currA, escale, 50, float(len(self.rankdata))/self.count, reverse=False)
-			self.currank = [(self.remaining[i], j) for i, j in rankdata]
+			drankdata = gu.DRank(currA, escale, 50, float(len(self.rankdata))/self.count, reverse=False)
+			self.currank = [(self.remaining[i], j) for i, j in drankdata]
 
 			self.reduce()

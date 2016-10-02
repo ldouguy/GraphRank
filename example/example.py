@@ -7,6 +7,8 @@ import json
 # The following example is the most likely use case:
 
 # first, build a dictionary of associated player names, called assoc here
+# this will most likely be done manually, and by no means needs be exhaustive
+# it is mostly important to associate players you expect to be highly ranked
 
 with open('../data/MI_assoc.json') as datafile:
     assoc = json.load(datafile)
@@ -21,10 +23,13 @@ MISD.init_from_assoc(assoc)
 tourneys = ["sweetprologue-meleesingles", "michigansmash-sweetmeleesingles17", "michigansmash-sweetmeleesingles18", "GrandPrix3Melee", "beachsmash-BB8", "beachsmash-BB9", "beachsmash-BB10"]
 MISD.challonge_add_tourneys(tourneys)
 
-# then calculate the rankings and spit out a data file and/or print the results
+# then calculate the necessary data and feed it into a ranking object
 
 MISD.calc_data()
 MISD.calc_AKR()
+
+# and finally run the rankings and spit out a data file and/or print the result
+
 MISD.AKR.reduce()
-MISD.record_AKR_ranking("example.json")
-MISD.print_AKR_ranking()
+MISD.record_AKR_ranking("example.json", tourney_cutoff=2)
+MISD.print_AKR_ranking(tourney_cutoff=2)

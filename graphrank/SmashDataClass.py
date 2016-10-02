@@ -42,7 +42,7 @@ class SD:
 				self.aliasList.append(assoc[player])
 				self.aliasDict[assoc[player]] = len(self.aliasList)-1
 			self.aliasDict[player] = self.aliasDict[assoc[player]]
-			
+
 	def challonge_add_players(self, tourneyID):
 		add_players(tourneyID, self.aliasSet, self.aliasDict, self.aliasList, self.tourneyCount)
 		print "players added for %s" % tourneyID
@@ -97,44 +97,62 @@ class SD:
 
 	############################
 
-	# To do:
-	# if tourneyCount[playerid] < threshold, do not include in rankings
-	# list same rank for tied scores (finish rank_ct/curr_score code)
-	# figure out why 2nd tier in AKR is broken
-
-	def record_AKR_ranking(self, outfilename='AKR.json', threshold=None):
-		outdict = {'ranking': {}, 'data': {}}
+	def record_AKR_ranking(self, outfilename='AKR.json', tourney_cutoff=None):
+		outdict = {'ranking': {}, 'data': {}, 'nowins': []}
 		rank = 0
-		# rank_ct = 0
-		# curr_score = [0, 0]
+		rank_ct = 0
 		tier = 0
 		for arr in self.AKR.rankdata[::-1]:
-			idx = rank
+			idx = rank_ct
 			rank = 0
+			rank_ct = 0
 			for playerid, score in arr[::-1][:idx]:
+				rank_ct += 1
+				outdict['data'][rank_ct][1].append(round(score, 2))
+				if tourney_cutoff and self.tourneyCount[playerid] < tourney_cutoff:
+					continue
 				rank += 1
-				outdict['data'][rank][1].append(round(score, 2))
 
 			for playerid, score in arr[::-1][idx:]:
+				rank_ct += 1
+				outdict['data'][rank_ct] = (self.aliasList[playerid], [round(score, 2)])
+				if tourney_cutoff and self.tourneyCount[playerid] < tourney_cutoff:
+					continue				
 				rank += 1
 				outdict['ranking'][rank] = (self.aliasList[playerid], tier, round(score, 2))
-
-				outdict['data'][rank] = (self.aliasList[playerid], [round(score, 2)])
 			tier += 1
+		for playerid in self.AKR.nowins:
+			outdict['nowins'].append(self.aliasList[playerid])
 
 		with open(outfilename, 'w') as outfile:
-			json.dump(outdict, outfile, indent=2)
+			json.dump(outdict, outfile)
 
-	def print_AKR_ranking(self, threshold=None, cutoff=None):
+	def print_AKR_ranking(self, tourney_cutoff=None, rank_cutoff=None):
 		rank = 0
-		# rank_ct = 0
-		# curr_score = [0,0]
+		rank_ct = 0
 		tier = 1
 		print "\nRank : Player" + " "*22 + "Tier, Score\n" + "="*46
 		for arr in self.AKR.rankdata[::-1]:
-			for playerid, score in arr[::-1][rank:]:
-				rank += 1
-				if cutoff and rank > cutoff:
+			tie_ct = 0
+			prev_score = None
+			for playerid, score in arr[::-1][rank_ct:]:
+				rank_ct += 1
+				if tourney_cutoff and self.tourneyCount[playerid] < tourney_cutoff:
+					continue
+
+				if score == prev_score:
+					tie_ct += 1
+				else:
+					rank += 1+tie_ct
+
+				if rank_cutoff and rank > rank_cutoff:
 					return
 				print "%-*s : %-*s(%d, %s)" % (4, rank, 30, self.aliasList[playerid], tier, round(score, 2))
+				prev_score = score
 			tier += 1
+
+		print "\n%d total players in tournament data" % len(self.aliasList)
+		print "%d players omitted for no wins" % len(self.AKR.nowins)
+		if tourney_cutoff:
+			low_att = len(self.aliasList)-len(self.AKR.nowins)-rank_ct
+			print "%d players omitted for low attendance" % low_att
