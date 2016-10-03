@@ -18,6 +18,11 @@ with open('../data/MI_assoc.json') as datafile:
 MISD = SD()
 MISD.init_from_assoc(assoc)
 
+# supply your Challonge API credentials to the SD object
+# Note: please use your own Challonge account, the credentials below are for demonstration only
+
+MISD.challonge_credentials("graphrank", "z3eYCSivr8d1A65b2OW4lAP8XZ5cK6zaZ20Jo2ek")
+
 # then iterate through tournaments, given by challonge URL name, and add each tourney's data
 
 tourneys = ["sweetprologue-meleesingles", "michigansmash-sweetmeleesingles17", "michigansmash-sweetmeleesingles18", "GrandPrix3Melee", "beachsmash-BB8", "beachsmash-BB9", "beachsmash-BB10"]

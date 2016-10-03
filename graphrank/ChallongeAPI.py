@@ -1,32 +1,31 @@
 import challonge
-import json
 
-with open('credentials.json') as data:
-	cred = json.load(data)
-	user = cred['username']
-	secretkey = cred['secretkey']
+class ChallongeAPI:
+	def __init__(self, user, secretKey):
+		self.user = user
+		self.secretKey = secretKey
 
-challonge.set_credentials(user, secretkey)
+	def add_players(self, tourneyID, aliasSet, aliasDict, aliasList, tourneyCount):
+		challonge.set_credentials(self.user, self.secretKey)
+		players = challonge.participants.index(tourneyID)
 
-def add_players(tourneyID, aliasSet, aliasDict, aliasList, tourneyCount):
-	players = challonge.participants.index(tourneyID)
+		for player in players:
+			if player['name'] not in aliasSet:
+				aliasSet.add(player['name'])
+				aliasList.append(player['name'])
+				aliasDict[player['name']] = len(aliasList)-1
 
-	for player in players:
-		if player['name'] not in aliasSet:
-			aliasSet.add(player['name'])
-			aliasList.append(player['name'])
-			aliasDict[player['name']] = len(aliasList)-1
+			# this assumes that challonge player id is greater than #(players)
+			# probably safe assumption, should probably formalize check later
+			# use an assert and raise an error otherwise
+			aliasDict[player['id']] = aliasDict[player['name']]
+			tourneyCount[aliasDict[player['id']]] += 1
 
-		# this assumes that challonge player id is greater than #(players)
-		# probably safe assumption, should probably formalize check later
-		# use an assert and raise an error otherwise
-		aliasDict[player['id']] = aliasDict[player['name']]
-		tourneyCount[aliasDict[player['id']]] += 1
+	def add_matches(self, tourneyID, multiGraph, aliasDict):
+		challonge.set_credentials(self.user, self.secretKey)
+		matches = challonge.matches.index(tourneyID)
 
-def add_matches(tourneyID, multiGraph, aliasDict):
-	matches = challonge.matches.index(tourneyID)
-
-	for match in matches:
-		winner = aliasDict[match['winner-id']]
-		loser = aliasDict[match['loser-id']]
-		multiGraph[winner][loser] += 1
+		for match in matches:
+			winner = aliasDict[match['winner-id']]
+			loser = aliasDict[match['loser-id']]
+			multiGraph[winner][loser] += 1

@@ -1,5 +1,4 @@
-from ChallongeAPI import add_players
-from ChallongeAPI import add_matches
+from ChallongeAPI import ChallongeAPI
 from collections import Counter
 from multiprocessing.dummy import Pool
 from AdjustedKatzRankClass import AKR
@@ -30,6 +29,9 @@ class SD:
 
 	############################
 
+	def challonge_credentials(self, user, secretKey):
+		self.challonge = ChallongeAPI(user, secretKey)
+
 	# invoke this function on a fresh SD
 	# assoc is association dict of challonge tags
 	#	assoc = {non-preferred tag : preferred tag}
@@ -44,14 +46,14 @@ class SD:
 			self.aliasDict[player] = self.aliasDict[assoc[player]]
 
 	def challonge_add_players(self, tourneyID):
-		add_players(tourneyID, self.aliasSet, self.aliasDict, self.aliasList, self.tourneyCount)
+		self.challonge.add_players(tourneyID, self.aliasSet, self.aliasDict, self.aliasList, self.tourneyCount)
 		print "players added for %s" % tourneyID
 
 	def challonge_init_multiGraph(self):
 		self.multiGraph = {i: Counter() for i in range(len(self.aliasList))}
 
 	def challonge_add_matches(self, tourneyID):
-		add_matches(tourneyID, self.multiGraph, self.aliasDict)
+		self.challonge.add_matches(tourneyID, self.multiGraph, self.aliasDict)
 		print "matches added for %s" % tourneyID
 
 	# run all 3 challonge functions above on a list of tourneys
@@ -131,6 +133,7 @@ class SD:
 		rank = 0
 		rank_ct = 0
 		tier = 1
+		final_tie = 0
 		print "\nRank : Player" + " "*22 + "Tier, Score\n" + "="*46
 		for arr in self.AKR.rankdata[::-1]:
 			tie_ct = 0
@@ -144,15 +147,17 @@ class SD:
 					tie_ct += 1
 				else:
 					rank += 1+tie_ct
+					tie_ct = 0
 
 				if rank_cutoff and rank > rank_cutoff:
 					return
 				print "%-*s : %-*s(%d, %s)" % (4, rank, 30, self.aliasList[playerid], tier, round(score, 2))
 				prev_score = score
 			tier += 1
+			final_tie = tie_ct
 
 		print "\n%d total players in tournament data" % len(self.aliasList)
 		print "%d players omitted for no wins" % len(self.AKR.nowins)
 		if tourney_cutoff:
-			low_att = len(self.aliasList)-len(self.AKR.nowins)-rank_ct
+			low_att = len(self.aliasList)-len(self.AKR.nowins)-rank-final_tie
 			print "%d players omitted for low attendance" % low_att

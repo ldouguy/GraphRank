@@ -1,6 +1,6 @@
 graphrank/manual_rank
+graphrank/credentials.json
 build
-pythontest.py
 TODO.txt
 
 *.pyc
