@@ -1,7 +1,10 @@
 graphrank/manual_rank
-graphrank/credentials.json
+
+dist
 build
 TODO.txt
 
+*test.py
+test.*
 *.pyc
 *.ipynb

@@ -4,13 +4,15 @@ GraphRank is a ranking algorithm intended to rank players in a tournament-based 
 
 ## Usage
 
-The current intended and documented functionality of the GraphRank package is to (1) retrieve tournament data from Challonge and (2) to calculate an approximate ranking of associated players.
-
-GraphRank is a simple Python package, installed in the usual way. First, download and extract the tar file located in dist, then navigate to the folder and run:
+GraphRank is a simple Python package, installed in the usual way. First, clone this repo or download the necessary files, and install from the command line (with root access) in the usual way:
 
 	python setup.py install
 
+Or simply execute code from the directory containing the graphrank module.
+
 For an example on how to generate rankings from Challonge links, see the "example.py" script in the example directory.
+
+Documentation is incomplete and in the process of updating.
 
 ## Requirements
 
@@ -31,11 +33,11 @@ GraphRank focuses on using the entire network of player data to infer connection
 
 GraphRank is still in Beta and is published mostly for sake of documentation and proof of concept. Issues such as optimizations and unit testing will be dealt with when the package is intended for more wide use.
 
-Upcoming updates should be focued on:
+Upcoming updates should be focused on:
 
 - Accuracy of the Katz Centrality and correcting algorithm
-- Addition of functionality such as excluding players with too few tournaments or games
-- Incorporation of cycle resolution (known as the FAS problem: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.47.7745)
-- More data files added
+- Addition of defensive coding checks and unittests
+- Addition of other APIs, such as from Smashgg
+- Improvements to data storage and reusability of saved data
 
 For any questions, please contact me via github.
