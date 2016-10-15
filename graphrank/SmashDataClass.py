@@ -35,6 +35,7 @@ class SmashData:
 	# much of this data is currently unused but still useful
 	def calc_data(self):
 		self.M = gu.MG_to_M(self.multiGraph)
+
 		data = gu.MG_to_G(self.multiGraph)
 		self.G = data[0]
 		self.D = data[1]

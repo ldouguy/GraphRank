@@ -80,17 +80,6 @@ def KRank(A, k, lim, direction=1, reverse=True):
 
     return KRank
 
-def DRank(A, k, lim, scale, reverse=True):
-    B = katz_degree(A, k, lim)
-    K = (np.sum(B, axis=1)).flatten().tolist()[0]
-    KL = (np.sum(B, axis=0)).flatten().tolist()[0]
-
-    players = zip(range(len(A)), [K[v] - scale*KL[v] for v in range(len(K))])
-
-    DRank = sorted(players, key=lambda v: v[1], reverse=reverse)
-
-    return DRank
-
 # Tarjan
 ########################
 

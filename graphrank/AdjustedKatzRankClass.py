@@ -2,12 +2,16 @@ import GraphUtils as gu
 import numpy as np
 
 class AKR:
-	def __init__(self, multiGraph, A):
+	def __init__(self, multiGraph, M):
 		self.rankdata = []
 		self.remaining = range(len(multiGraph))
 		self.nowins = []
 
-		self.A = A
+		self.M = M
+
+		for i in range(len(M)):
+			for j in range(len(M)):
+				self.M[i, j] = self.M[i, j]**.5
 
 		for i in multiGraph:
 			if not multiGraph[i]:
@@ -15,14 +19,15 @@ class AKR:
 				self.remaining.remove(i)
 		self.count = len(self.remaining)
 
-		currA = self.A[np.ix_(self.remaining, self.remaining)]
+		currM = self.M[np.ix_(self.remaining, self.remaining)]
+		self.prevM = self.M
 
-		eigval = max(abs(np.linalg.eig(currA)[0]))
+		eigval = max(abs(np.linalg.eig(currM)[0]))
 		if not eigval or eigval < 1.6:
 			eigval = 1.6
 		escale = round(.8*eigval**(-1), 2)
 
-		rankdata = gu.KRank(currA, escale, 50, reverse=False)
+		rankdata = gu.KRank(currM, escale, 50, reverse=False)
 		self.currank = [(self.remaining[i], j) for i, j in rankdata]
 
 	def reduce(self):
@@ -43,13 +48,19 @@ class AKR:
 			for i in [i for i,j in self.currank[:n]]:
 				self.remaining.remove(i)
 
-			currA = self.A[np.ix_(self.remaining, self.remaining)]
-			eigval = max(abs(np.linalg.eig(currA)[0]))
+			currM = self.M[np.ix_(self.remaining, self.remaining)]
+			eigval = max(abs(np.linalg.eig(currM)[0]))
 			if not eigval or eigval < 1.6:
 				eigval = 1.6
 			escale = round(.8*eigval**(-1), 2)
 
-			drankdata = gu.DRank(currA, escale, 50, float(len(self.rankdata))/self.count, reverse=False)
+			lscale = float(self.count - len(self.remaining))/self.count
+
+			krank = gu.KRank(currM, escale, 50, reverse=False)
+			klrank = gu.KRank(currM, escale, 50, reverse=False, direction=0)
+
+			drankdata = [(i, j - lscale*k) for ((i, j), (n, k)) in zip(krank, klrank)]
+
 			self.currank = [(self.remaining[i], j) for i, j in drankdata]
 
 			self.reduce()
