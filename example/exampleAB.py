@@ -21,5 +21,5 @@ MISD.calc_data()
 MISD.calc_AKR()
 
 MISD.AKR.reduce()
-MISD.record_AKR_ranking("exampleAB.json")
-MISD.print_AKR_ranking()
+MISD.record_AKR_ranking("exampleAB.json", tourney_cutoff=2)
+MISD.print_AKR_ranking(tourney_cutoff=2)

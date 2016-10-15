@@ -102,7 +102,7 @@ class AssocBuilder:
 		remove = set()
 		for i in self._tagList:
 			if self._tagList[i] in self._linked:
-				remove.add(tag)
+				remove.add(self._tagList[i])
 				del self._tagList[i]
 
 		self._linked -= remove
