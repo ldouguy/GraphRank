@@ -4,13 +4,13 @@ from graphrank.PlayerDataClass import PlayerData as PD
 from graphrank.SmashDataClass import SmashData as SD
 from graphrank.AssocBuilder import AssocBuilder as AB
 
-tourneys = ["beachsmash-BB25", "beachsmash-summitsingles", "beachsmash-bb23", "beachsmash-bb24"]
+tourneys = ["beachsmash-BB25", "beachsmash-summitsingles", "beachsmash-bb23", "beachsmash-bb24", "beachsmash-msswtop64", "beachsmash-bb21"]
 
 CAPI = CAPI("graphrank", "z3eYCSivr8d1A65b2OW4lAP8XZ5cK6zaZ20Jo2ek", tourneys)
 AB = AB(CAPI)
-assoc = AB.assoc
+AB.save_to_json("MIrecent.json")
 
-MIPD = PD(assoc=assoc)
+MIPD = PD(assoc=AB.assoc)
 CAPI.add_players(MIPD)
 
 MISD = SD(MIPD, CAPI)

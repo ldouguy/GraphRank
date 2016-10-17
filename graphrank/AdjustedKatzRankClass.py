@@ -5,6 +5,7 @@ class AKR:
 	def __init__(self, multiGraph, M):
 		self.rankdata = []
 		self.remaining = range(len(multiGraph))
+		self.prevRemaining = range(len(multiGraph))
 		self.nowins = []
 
 		self.M = M
@@ -25,9 +26,10 @@ class AKR:
 		eigval = max(abs(np.linalg.eig(currM)[0]))
 		if not eigval or eigval < 1.6:
 			eigval = 1.6
-		escale = round(.8*eigval**(-1), 2)
+		escale = round(1*eigval**(-1), 2)
 
-		rankdata = gu.KRank(currM, escale, 50, reverse=False)
+		K = gu.KRank(currM, escale, 50)
+		rankdata = sorted(zip(range(len(currM)), K), key=lambda v: v[1])
 		self.currank = [(self.remaining[i], j) for i, j in rankdata]
 
 	def reduce(self):
@@ -52,15 +54,24 @@ class AKR:
 			eigval = max(abs(np.linalg.eig(currM)[0]))
 			if not eigval or eigval < 1.6:
 				eigval = 1.6
-			escale = round(.8*eigval**(-1), 2)
+			escale = round(1*eigval**(-1), 2)
 
 			lscale = float(self.count - len(self.remaining))/self.count
 
-			krank = gu.KRank(currM, escale, 50, reverse=False)
-			klrank = gu.KRank(currM, escale, 50, reverse=False, direction=0)
+			K = gu.KRank(currM, escale, 50)
+			KL = gu.KRank(currM, escale, 50, direction=0)
 
-			drankdata = [(i, j - lscale*k) for ((i, j), (n, k)) in zip(krank, klrank)]
+			D = [i-j**.5 for i, j in zip(K, KL)]
+
+			drankdata = sorted(zip(range(len(currM)), K), key=lambda v: v[1])
+
+			# krank = gu.KRank(currM, escale, 50, reverse=False)
+			# klrank = gu.KRank(currM, escale, 50, reverse=False, direction=0)
+
+			# drankdata = [(i, j - lscale*k) for ((i, j), (n, k)) in zip(krank, klrank)]
 
 			self.currank = [(self.remaining[i], j) for i, j in drankdata]
+			self.prevM = currM
+			self.prevRemain = self.remaining
 
 			self.reduce()

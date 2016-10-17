@@ -70,15 +70,15 @@ def katz_degree(A, k, lim):
 
 # direction gives direction of arrows in graph
 # 0 for losses, 1 for wins(default)
-def KRank(A, k, lim, direction=1, reverse=True):
+def KRank(A, k, lim, direction=1): #reverse=True):
     D = katz_degree(A, k, lim)
     K = (np.sum(D, axis=direction)).flatten().tolist()[0]
 
-    players = zip(range(len(A)), K)
+    # players = {i: K[i] for i in range(len(A))}
 
-    KRank = sorted(players, key=lambda v: v[1], reverse=reverse)
+    # KRank = sorted(players, key=lambda v: v[1], reverse=reverse)
 
-    return KRank
+    return K
 
 # Tarjan
 ########################

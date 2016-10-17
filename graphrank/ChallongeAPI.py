@@ -1,4 +1,6 @@
 import challonge
+import json
+import os
 from collections import Counter
 from multiprocessing.dummy import Pool
 from pprint import pprint
@@ -20,18 +22,41 @@ class ChallongeAPI:
 		multipool.map(self._get_matches, tourneys)
 
 	def _get_players(self, tourneyID):
-		players = challonge.participants.index(tourneyID)
+		playerDict = {}
+		if os.path.isfile("data/challonge/players/" + tourneyID + "playerdata.json"):
+			with open("data/challonge/players/" + tourneyID + "playerdata.json") as playerData:
+				playerDict = json.load(playerData)
+		else:
+			players = challonge.participants.index(tourneyID)
+			for player in players:
+				playerDict[player['id']] = player['name']
+			with open("data/challonge/players/" + tourneyID + "playerdata.json", "w") as outfile:
+				json.dump(playerDict, outfile, indent=2)
 
-		for player in players:
-			self.playerDict[player['id']] = player['name']
-			self.ctourneyCount[player['id']] += 1
+		for pid in playerDict:
+			self.playerDict[int(pid)] = playerDict[pid]
+			self.ctourneyCount[int(pid)] += 1
 
 	def _get_matches(self, tourneyID):
-		matches = challonge.matches.index(tourneyID)
-		for match in matches:
-			if match['winner-id'] not in self.matchData:
-				self.matchData[match['winner-id']] = Counter()
-			self.matchData[match['winner-id']][match['loser-id']] += 1
+		matchData = {}
+		if os.path.isfile("data/challonge/matches" + tourneyID + "matchdata.json"):
+			with open("data/challonge/matches/" + tourneyID + "matchdata.json") as matchesData:
+				matchData = json.load(matchesData)
+		else:
+			matches = challonge.matches.index(tourneyID)
+			for match in matches:
+				if match['winner-id'] not in matchData:
+					matchData[match['winner-id']] = Counter()
+				matchData[match['winner-id']][match['loser-id']] += 1
+
+			with open("data/challonge/matches/" + tourneyID + "matchdata.json", "w") as outfile:
+				json.dump(matchData, outfile, indent=2)
+
+		for wid in matchData:
+			if wid not in self.matchData:
+				self.matchData[wid] = Counter()
+			for lid in matchData[wid]:
+				self.matchData[wid][lid] += matchData[wid][lid]
 
 	####################################################
 
