@@ -5,6 +5,7 @@ from PlayerDataClass import PlayerData as PD
 from AdjustedKatzRankClass import AKR
 import GraphUtils as gu
 import json
+import numpy as np
 
 class SmashData:
 	def __init__(self, PD, CAPI=None, SAPI=None):
@@ -40,6 +41,15 @@ class SmashData:
 		self.G = data[0]
 		self.D = data[1]
 		self.A = gu.G_to_A(self.G)
+
+		self.DA = np.matrix([[0 for col in self.M] for col in self.M])
+		for i in self.D:
+			for j in self.D[i]:
+				self.DA[i, j] = 1
+
+		self.W = self.A + (.5)*self.DA
+		# TODO: implement a function to scale results from 0 to 1
+
 		self.partition = gu.SCC(self.G)
 		self.inCycle = gu.record_cycles(self.G, self.partition)
 		self.isBelow = gu.record_isBelow(self.G, self.inCycle)
@@ -47,8 +57,16 @@ class SmashData:
 
 	############################
 
-	def calc_AKR(self):
-		self.AKR = AKR(self.multiGraph, self.A)
+	# in(put) param selects input matrix
+	# 0: A; 1: W; 2: M
+	# wlcf stands for win-loss comparison function
+	def calc_AKR(self, damp=.8, sieve=3, top=5, eiglim=1.6, matrix=1, wlcf=lambda x,y: x):
+		if not matrix:
+			self.AKR = AKR(self.multiGraph, self.A, damp=damp, sieve=sieve, top=top, eiglim=eiglim, wlcf=wlcf)
+		elif matrix == 1:
+			self.AKR = AKR(self.multiGraph, self.W, damp=damp, sieve=sieve, top=top, eiglim=eiglim, wlcf=wlcf)
+		else:
+			self.AKR = AKR(self.multiGraph, self.M, damp=damp, sieve=sieve, top=top, eiglim=eiglim, wlcf=wlcf)
 		self.AKR.reduce()
 
 	############################

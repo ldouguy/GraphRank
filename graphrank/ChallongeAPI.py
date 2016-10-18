@@ -11,7 +11,7 @@ class ChallongeAPI:
 		self.user = user
 		self.secretKey = secretKey
 
-		challonge.set_credentials(self.user, self. secretKey)
+		challonge.set_credentials(self.user, self.secretKey)
 
 		self.playerDict = {}
 		self.ctourneyCount = Counter()

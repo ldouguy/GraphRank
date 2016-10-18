@@ -2,13 +2,18 @@ import GraphUtils as gu
 import numpy as np
 
 class AKR:
-	def __init__(self, multiGraph, M):
+	def __init__(self, multiGraph, M, damp=.8, sieve=3, top=5, eiglim=1.6, wlcf=lambda x,y: x):
 		self.rankdata = []
 		self.remaining = range(len(multiGraph))
 		self.prevRemaining = range(len(multiGraph))
 		self.nowins = []
 
 		self.M = M
+		self.damp = damp
+		self.sieve = sieve
+		self.top = top
+		self.eiglim = eiglim
+		self.wlcf = wlcf
 
 		for i in range(len(M)):
 			for j in range(len(M)):
@@ -24,26 +29,20 @@ class AKR:
 		self.prevM = self.M
 
 		eigval = max(abs(np.linalg.eig(currM)[0]))
-		if not eigval or eigval < 1.6:
-			eigval = 1.6
-		escale = round(1*eigval**(-1), 2)
+		if not eigval or eigval < eiglim:
+			eigval = eiglim
+		escale = damp*eigval**(-1)
 
 		K = gu.KRank(currM, escale, 50)
 		rankdata = sorted(zip(range(len(currM)), K), key=lambda v: v[1])
 		self.currank = [(self.remaining[i], j) for i, j in rankdata]
 
 	def reduce(self):
-		if len(self.currank) <= 5:
-			# I don't understand why I need to make this check
-			# If I don't, rankdata somehow gets the last currank appended twice
-			if self.rankdata[-1] != self.currank:
-				self.rankdata.append(self.currank)
-
-		else:
+		while len(self.currank) > self.top:
 			self.rankdata.append(self.currank)
 
 			#find point of change after cutoff point
-			n = len(self.currank)/3
+			n = max(1, len(self.currank)/self.sieve)
 			while self.currank[n] == self.currank[n+1]:
 				n += 1
 
@@ -52,26 +51,25 @@ class AKR:
 
 			currM = self.M[np.ix_(self.remaining, self.remaining)]
 			eigval = max(abs(np.linalg.eig(currM)[0]))
-			if not eigval or eigval < 1.6:
-				eigval = 1.6
-			escale = round(1*eigval**(-1), 2)
+			if not eigval or eigval < self.eiglim:
+				eigval = self.eiglim
+			escale = self.damp*eigval**(-1)
 
+			# used for scaling losses in wlcf
 			lscale = float(self.count - len(self.remaining))/self.count
 
 			K = gu.KRank(currM, escale, 50)
 			KL = gu.KRank(currM, escale, 50, direction=0)
 
-			D = [i-j**.5 for i, j in zip(K, KL)]
+			D = [self.wlcf(i, j) for i, j in zip(K, KL)]
 
-			drankdata = sorted(zip(range(len(currM)), K), key=lambda v: v[1])
-
-			# krank = gu.KRank(currM, escale, 50, reverse=False)
-			# klrank = gu.KRank(currM, escale, 50, reverse=False, direction=0)
-
-			# drankdata = [(i, j - lscale*k) for ((i, j), (n, k)) in zip(krank, klrank)]
+			drankdata = sorted(zip(range(len(currM)), D), key=lambda v: v[1])
 
 			self.currank = [(self.remaining[i], j) for i, j in drankdata]
 			self.prevM = currM
 			self.prevRemain = self.remaining
 
-			self.reduce()
+		# I don't understand why I need to make this check
+		# If I don't, rankdata somehow gets the last currank appended twice
+		if self.rankdata[-1] != self.currank:
+			self.rankdata.append(self.currank)

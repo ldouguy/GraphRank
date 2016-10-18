@@ -15,16 +15,16 @@ class AssocBuilder:
 		self._assocIdx = defaultdict(list)
 		self._tagList = {i: tag for i, tag in enumerate(sorted(list(self._unlinked), key=lambda string: str(string).lower()))}
 
-		if assocFile:
-			with open(assocFile) as assocdata:
-				preassoc = json.load(assocdata)
-			pairs = []
-			rDict = {self._tagList[i]: i for i in self._tagList}
-			for tag in preassoc:
-				if tag in self._unlinked:
-					pairs.append((rDict[tag], rDict[preassoc[tag]]))
+		# if assocFile:
+		# 	with open(assocFile) as assocdata:
+		# 		preassoc = json.load(assocdata)
+		# 	pairs = []
+		# 	rDict = {self._tagList[i]: i for i in self._tagList}
+		# 	for tag in preassoc:
+		# 		if tag in self._unlinked:
+		# 			pairs.append((rDict[tag], rDict[preassoc[tag]]))
 
-			self._link(pairs)
+		# 	self._link(pairs)
 
 		self._print()
 		self._match()
