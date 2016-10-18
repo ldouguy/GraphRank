@@ -4,12 +4,14 @@ GraphRank is a ranking algorithm intended to rank players in a tournament-based 
 
 ## Usage
 
-GraphRank is a simple Python package, installed in the usual way. First, clone this repo or download the necessary files, and install from the command line (with root access) in the usual way:
+Graphrank can be installed as a Python package in the usual way, but until stable build is released, I recommend cloning the repository and running scripts from the same directory.
+
+<!-- GraphRank is a simple Python package, installed in the usual way. First, clone this repo or download the necessary files, and install from the command line (with root access) in the usual way:
 
 	python setup.py install
 
 Or simply execute code from the directory containing the graphrank module.
-
+ -->
 For an example on how to generate rankings from Challonge links, see the "example.py" script in the example directory.
 
 Documentation is incomplete and in the process of updating.
