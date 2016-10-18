@@ -2,7 +2,7 @@ import GraphUtils as gu
 import numpy as np
 
 class AKR:
-	def __init__(self, multiGraph, M, damp=.8, sieve=3, top=5, eiglim=1.6, wlcf=lambda x,y: x):
+	def __init__(self, multiGraph, M, damp=.8, sieve=3, top=5, eiglim=1.6, wlcf=lambda x,y,z: x):
 		self.rankdata = []
 		self.remaining = range(len(multiGraph))
 		self.prevRemaining = range(len(multiGraph))
@@ -61,7 +61,7 @@ class AKR:
 			K = gu.KRank(currM, escale, 50)
 			KL = gu.KRank(currM, escale, 50, direction=0)
 
-			D = [self.wlcf(i, j) for i, j in zip(K, KL)]
+			D = [self.wlcf(i, j, lscale) for i, j in zip(K, KL)]
 
 			drankdata = sorted(zip(range(len(currM)), D), key=lambda v: v[1])
 

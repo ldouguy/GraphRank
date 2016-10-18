@@ -60,7 +60,7 @@ class SmashData:
 	# in(put) param selects input matrix
 	# 0: A; 1: W; 2: M
 	# wlcf stands for win-loss comparison function
-	def calc_AKR(self, damp=.8, sieve=3, top=5, eiglim=1.6, matrix=1, wlcf=lambda x,y: x):
+	def calc_AKR(self, damp=.8, sieve=3, top=5, eiglim=1.6, matrix=1, wlcf=lambda x,y,z: x):
 		if not matrix:
 			self.AKR = AKR(self.multiGraph, self.A, damp=damp, sieve=sieve, top=top, eiglim=eiglim, wlcf=wlcf)
 		elif matrix == 1:
