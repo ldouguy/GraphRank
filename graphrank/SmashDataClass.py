@@ -106,13 +106,14 @@ class SmashData:
 		rank_ct = 0
 		tier = 1
 		final_tie = 0
+		tie_ct = 0
 		print "\nRank : Player" + " "*22 + "Tier, Score\n" + "="*46
 		for arr in self.AKR.rankdata[::-1]:
-			tie_ct = 0
 			prev_score = None
 			for playerid, score in arr[::-1][rank_ct:]:
 				rank_ct += 1
 				if tourney_cutoff and self.PD.tourneyCount[playerid] < tourney_cutoff:
+					# if optional arg passed, print the ineligible as well
 					continue
 
 				if score == prev_score:

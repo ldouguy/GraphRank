@@ -21,8 +21,8 @@ MISD.init_multiGraph()
 MISD.record_matches()
 
 MISD.calc_data()
-MISD.calc_AKR()
+MISD.calc_AKR(eiglim=2, matrix=0)
 
 MISD.AKR.reduce()
-# MISD.record_AKR_ranking("example.json", tourney_cutoff=2)
+MISD.record_AKR_ranking("example.json", tourney_cutoff=2)
 MISD.print_AKR_ranking(tourney_cutoff=2)

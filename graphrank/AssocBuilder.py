@@ -15,16 +15,16 @@ class AssocBuilder:
 		self._assocIdx = defaultdict(list)
 		self._tagList = {i: tag for i, tag in enumerate(sorted(list(self._unlinked), key=lambda string: str(string).lower()))}
 
-		# if assocFile:
-		# 	with open(assocFile) as assocdata:
-		# 		preassoc = json.load(assocdata)
-		# 	pairs = []
-		# 	rDict = {self._tagList[i]: i for i in self._tagList}
-		# 	for tag in preassoc:
-		# 		if tag in self._unlinked:
-		# 			pairs.append((rDict[tag], rDict[preassoc[tag]]))
+		if assocFile:
+			with open(assocFile) as assocdata:
+				preassoc = json.load(assocdata)
+			pairs = []
+			rDict = {self._tagList[i]: i for i in self._tagList}
+			for tag in preassoc:
+				if tag in self._unlinked:
+					pairs.append((rDict[tag], rDict[preassoc[tag]]))
 
-		# 	self._link(pairs)
+			self._link(pairs)
 
 		self._print()
 		self._match()
@@ -62,6 +62,8 @@ class AssocBuilder:
 							self._print()
 						elif cmd == "help":
 							self._help()
+						elif cmd == "save":
+							self._save()
 						elif cmd == "apply":
 							yesno = raw_input("Are you sure you'd like to continue? (y to confirm)\n>>> ")
 							if yesno == "y":
@@ -144,16 +146,29 @@ class AssocBuilder:
 				print i, " is not a valid index"
 
 	def _help(self):
-		print "\nlink:"
-		print "\nunlink:"
-		print "\napply:"
-		print "\nprint:"
-		print "\nset:"
+		print "\nlink  : Main command, used to associate tags; type link to enter linking mode"
+		print "\nunlink: Used only to correct mistakes; type unlink followed by any number of indices, separated by spaces (eg. 'unlink 5 10')"
+		print "\nset   : Verify tags as the correct tag; type set followed by any number of indices, separated by spaces (eg. 'set 5 10')"
+		print "\napply : Apply the changes and clear the linked tags from tracking (will no longer appear in print)"
+		print "\nprint : Print the table of association data to review or make more associations"
+		print "\nsave  : Save the Assoc dictionary as a json file; follow the prompt to name the output"
+		print "\nexit  : Exit the AssocBuilder and execute the remainder of the script"
 		print "\n>>> "
 		pass
+
+	def _save(self):
+		cmdstr = raw_input("Enter the name of json output (don't include '.json'): ")
+		out = cmdstr
+		if not cmdstr:
+			out = "assoc"
+		try:
+			self.save_to_json(out+".json")
+		except:
+			print "The filename you entered is invalid. Please enter a better one."
 
 	###########################
 
 	def save_to_json(self, outfile="assoc.json"):
+		outfile = "data/assocs/" + outfile
 		with open(outfile, "w") as out:
-			json.dump(self.assoc, out, indent=2)
+			json.dump(self.assoc, out, indent=2) 
